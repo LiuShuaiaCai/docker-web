@@ -7,6 +7,7 @@ RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install sockets
+RUN docker-php-ext-install bcmath
 
 RUN apt-get update && apt-get install gzip 
 RUN mkdir -p /usr/src/php/ext/redis \
