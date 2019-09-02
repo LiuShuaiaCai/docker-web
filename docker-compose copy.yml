@@ -1,0 +1,66 @@
+version: "0.1"
+services: 
+  db:
+    build: ./mysql
+    container_name: db
+    volumes: 
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf:/etc/mysql/conf.d
+      - ./mysql/logs:/var/log/mysql
+    ports: 
+      - "3306:3306"
+    environment: 
+      MYSQL_ROOT_PASSWORD: liushuaicai
+      MYSQL_USER: lsc
+      MYSQL_PASSWORD: liushuaicai
+    restart: always
+  php:
+    build: ./php-fpm
+    container_name: php
+    volumes: 
+      - /data/eh/app/plan.mubiao.online:/www/web/plan.mubiao.online
+      - ./php-fpm/logs:/var/log/php-fpm
+      - ./php-fpm/conf/php.ini:/usr/src/php/php.ini
+    ports: 
+      - "9000:9000"
+    links: 
+      - db
+    restart: always
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    volumes: 
+      - /data/eh/app/plan.mubiao.online:/www/web/plan.mubiao.online
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d
+    links: 
+      - php
+    ports: 
+      - "80:80"
+    restart: always
+  redis:
+    build: ./redis
+    container_name: redis
+    ports: 
+      - "6379:6379"
+    environment: 
+      REDIS_PORT: 6379
+    volumes: 
+      - ./redis/redis.conf:/etc/redis/redis.conf
+      - ./redis/data:/data
+    restart: always
+    privileged: true
+  rabbitmq:
+    build: ./rabbitmq
+    container_name: rabbitmq
+    ports: 
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "15671:15671"
+      - "15672:15672"
+    environment: 
+      - RABBITMQ_DEFAULT_USER=lsc
+      - RABBITMQ_DEFAULT_PASS=123456
+    restart: always    
